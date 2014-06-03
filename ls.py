@@ -24,6 +24,10 @@ def version(author, version, name, description):
 def command_ls(opts):
     d= os.getcwd()
     files=os.listdir(d)
+
+    # Filter files according to -a flag
+    if not opts.all:
+        files = [f for f in files if f[0] != "."]
     for f in files:
         print(f)
 
@@ -34,7 +38,6 @@ def output(files, opts):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.parse_args()
-
-    opts = {}
+    parser.add_argument("-a", "--all", help="all files. Do not ignore entries starting with .", action="store_true" )
+    opts = parser.parse_args()
     command_ls(opts)
