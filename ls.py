@@ -40,4 +40,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-a", "--all", help="all files. Do not ignore entries starting with .", action="store_true" )
     opts = parser.parse_args()
+    opts.isterminal = sys.stdout.isatty()
     command_ls(opts)
