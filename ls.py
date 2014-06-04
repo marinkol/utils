@@ -47,4 +47,4 @@ if __name__ == "__main__":
         opts.rows = r
         opts.cols = c
     print("Rows: {}, Columns: {}".format(opts.rows, opts.cols)) 
-    command_sls(opts)
+    command_ls(opts)

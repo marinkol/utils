@@ -2,6 +2,13 @@ import sys
 import os
 from subprocess import check_output, CalledProcessError
 
+class TerminalError(Exception):
+    def __init__(self, description):
+        self.description = description
+
+    def __str__(self):
+        return repr(self.description)
+
 def term_size(fd):
     """
     Returns the size of the terminal, connected to file_descriptor fd.
@@ -11,16 +18,14 @@ def term_size(fd):
     Uses one of several metods [ioctl, stty size], to determine terminal size.
     """
     if not isterminal(fd):
-        print("File descriptor not a terminal!")
-        sys.exit(1)
+        raise TerminalError("File descriptor [{}] is not tty!".format(fd))
     try:
         rows, cols = fcntl_term_size(fd)
     except:
         try:
             rows, cols = stty_term_size()
-        except CalledProcessError as e:
-            print("Could not execute stty_term_size!")
-            sys.exit(1)
+        except:
+            raise TerminalError("Could not get terminal size!")
     return rows, cols
 
 # Use ioctl's to get current terminal size
