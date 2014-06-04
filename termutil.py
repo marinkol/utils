@@ -19,13 +19,16 @@ def term_size(fd):
     """
     if not isterminal(fd):
         raise TerminalError("File descriptor [{}] is not tty!".format(fd))
-    try:
-        rows, cols = fcntl_term_size(fd)
-    except:
+    if "get_terminal_size" in dir(os):
+        rows, cols = os.get_terminal_size(fd)
+    else:
         try:
-            rows, cols = stty_term_size()
+            rows, cols = fcntl_term_size(fd)
         except:
-            raise TerminalError("Could not get terminal size!")
+            try:
+                rows, cols = stty_term_size()
+            except:
+                raise TerminalError("Could not get terminal size!")
     return rows, cols
 
 # Use ioctl's to get current terminal size
