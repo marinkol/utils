@@ -1,5 +1,6 @@
 import sys
 import os
+from subprocess import check_output, CalledProcessError
 
 def term_size(fd):
     """
@@ -9,27 +10,30 @@ def term_size(fd):
 
     Uses one of several metods [ioctl, stty size], to determine terminal size.
     """
-    #if not isterminal(fd):
-    #    print("File descriptor not a terminal!")
-    #    sys.exit(1)
+    if not isterminal(fd):
+        print("File descriptor not a terminal!")
+        sys.exit(1)
     try:
-        rows, cols = fcntl_term_size()
+        rows, cols = fcntl_term_size(fd)
     except:
-        rows, cols = stty_term_size()
+        try:
+            rows, cols = stty_term_size()
+        except CalledProcessError as e:
+            print("Could not execute stty_term_size!")
+            sys.exit(1)
     return rows, cols
 
 # Use ioctl's to get current terminal size
-def fcntl_term_size():
+def fcntl_term_size(fd):
     import fcntl, termios, struct
     h, w, hp, wp = struct.unpack('HHHH',
-        fcntl.ioctl(0, termios.TIOCGWINSZ,
+        fcntl.ioctl(fd, termios.TIOCGWINSZ,
         struct.pack('HHHH', 0, 0, 0, 0)))
     return h, w
 
 def stty_term_size():
-    import os
-    rows, columns = os.popen('stty size', 'r').read().split()
-    return rows, columns
+    rows, columns = check_output(["stty", "size"]).split()
+    return int(rows), int(columns)
 
 def isterminal(fd):
     return os.isatty(fd) 

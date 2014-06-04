@@ -13,8 +13,7 @@ import os.path
 import sys
 
 import argparse
-import termutil
-from termutil import term_size
+from termutil import term_size, isterminal
 
 util="ls"
 _shortdesc = "list files"
@@ -42,10 +41,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-a", "--all", help="all files. Do not ignore entries starting with .", action="store_true" )
     opts = parser.parse_args()
-    opts.isterminal = sys.stdout.isatty()
-    if opts.isterminal:
-        r,c = term_size(sys.stdout.fileno)
+    opts.terminal = isterminal(sys.stdout.fileno())
+    if opts.terminal:
+        r,c = term_size(sys.stdout.fileno())
         opts.rows = r
         opts.cols = c
     print("Rows: {}, Columns: {}".format(opts.rows, opts.cols)) 
-    command_ls(opts)
+    command_sls(opts)
