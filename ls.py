@@ -31,11 +31,38 @@ def command_ls(opts):
         files = [f for f in files if f[0] != "."]
     for f in files:
         print(f)
+    output_cols(files, opts)
 
 def output(files, opts):
     cnt = len(files)
-    
 
+def output_cols(files, opts, spacing=1):
+    colwidth = max(len(w) for w in files) + spacing
+    cols = opts.cols // colwidth
+    rows = list_to_columns(files, cols)
+
+    for row in rows:
+        line = "".join(item.ljust(colwidth) for item in row)
+        print(line)
+        
+def list_to_columns(ls, cols):
+    """
+    Split flat list into list of [cols] colums
+
+    example:
+        try:
+        l = [1, 2, 3, 4, 5]
+        ret = list_to_columns(ls, 2)
+        ret 
+        [[1, 3], [2, 4], [5]]
+    """
+    rows = len(ls) //int(cols)
+    if len(ls) % cols:
+        rows += 1
+    ret = []
+    for i in range(rows):
+        ret.append(ls[i::rows])
+    return ret
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
